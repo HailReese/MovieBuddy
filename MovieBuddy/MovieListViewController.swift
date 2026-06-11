@@ -9,7 +9,11 @@ import UIKit
 
 class MovieListViewController: UIViewController {
     
-    let movies = ["Seven", "Hulk", "Scream", "Iron Man", "Dark Knight"]
+    var movies: [Movie] = [
+        Movie(title: "Seven", year: 1995, rating: 8.6, description: "Two detectives hunt a serial killer."),
+        Movie(title: "Hulk", year: 2003, rating: 5.6, description: "Bruce Banner transforms into a powerful green monster."),
+        Movie(title: "The Dark Knight", year: 2008, rating: 9.0, description: "Batman faces his ultimate enemy, the Joker.")
+    ]
     
     // MARK: UI Elements
     
@@ -31,7 +35,7 @@ extension MovieListViewController {
     func uiExecutor() {
         view.addSubview(tableView)
         
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "MovieCell")
+        tableView.register(MovieTableViewCell.self, forCellReuseIdentifier: "MovieCell")
         tableView.dataSource = self
         tableView.delegate = self
         
@@ -53,13 +57,13 @@ extension MovieListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieTableViewCell
         
         let movieTitle = movies[indexPath.row]
         
-        var content = cell.defaultContentConfiguration()
-        content.text = movieTitle
-        cell.contentConfiguration = content
+//        var content = cell.defaultContentConfiguration()
+//        content.text = movieTitle
+        cell.titleLabel.text = movieTitle.title
         
         return cell
     }
