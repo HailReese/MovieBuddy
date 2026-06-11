@@ -18,7 +18,7 @@ class MovieListViewController: UIViewController {
         table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         uiExecutor()
@@ -33,8 +33,7 @@ extension MovieListViewController {
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "MovieCell")
         tableView.dataSource = self
-        
-        
+        tableView.delegate = self
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -48,28 +47,32 @@ extension MovieListViewController {
 // MARK: - UITableViewDataSource
 extension MovieListViewController: UITableViewDataSource {
     
-    // 1. Вопрос таблицы: "Сколько строк мне нарисовать?"
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return movies.count
-        // ТВОЙ КОД: Верни количество элементов из массива movies
     }
     
-    // 2. Вопрос таблицы: "Дай мне готовую ячейку для строки №..."
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        // а) Вытаскиваем свободную ячейку из пула переиспользования
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath)
         
-        // б) ТВОЙ КОД: Достань правильное название фильма из массива movies.
-        // Индекс текущей строки хранится в indexPath.row
         let movieTitle = movies[indexPath.row]
         
-        // в) Настраиваем внешний вид ячейки (iOS 14+)
         var content = cell.defaultContentConfiguration()
         content.text = movieTitle
         cell.contentConfiguration = content
         
-        // г) Отдаем готовую ячейку таблице
         return cell
+    }
+}
+
+// MARK: - UITableViewDelegate
+extension MovieListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let selectedMovie = movies[indexPath.row]
+        
+        print("Пользователь нажал на фильм: \(selectedMovie)")
     }
 }
