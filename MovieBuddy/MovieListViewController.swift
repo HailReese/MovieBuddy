@@ -39,6 +39,9 @@ extension MovieListViewController {
         tableView.dataSource = self
         tableView.delegate = self
         
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 120
+        
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -59,11 +62,11 @@ extension MovieListViewController: UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieTableViewCell
         
-        let movieTitle = movies[indexPath.row]
+        let movie = movies[indexPath.row]
         
 //        var content = cell.defaultContentConfiguration()
 //        content.text = movieTitle
-        cell.titleLabel.text = movieTitle.title
+        cell.configure(for: movie)
         
         return cell
     }
