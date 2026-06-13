@@ -12,5 +12,6 @@ struct Movie {
     let year: Int
     let rating: Double
     let description: String
+    let imageName: String
 }
 

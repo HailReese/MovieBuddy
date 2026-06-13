@@ -70,8 +70,8 @@ class MovieTableViewCell: UITableViewCell {
         NSLayoutConstraint.activate([
             posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            posterImageView.widthAnchor.constraint(equalToConstant: 76),
-            posterImageView.heightAnchor.constraint(equalToConstant: 100),
+            posterImageView.widthAnchor.constraint(equalToConstant: 80),
+            posterImageView.heightAnchor.constraint(equalTo: posterImageView.widthAnchor, multiplier: 1.5),
             
             contentView.bottomAnchor.constraint(greaterThanOrEqualTo: posterImageView.bottomAnchor, constant: 8),
             
@@ -99,5 +99,6 @@ class MovieTableViewCell: UITableViewCell {
         yearLabel.text = "Year: \(String(movie.year))"
         ratingLabel.text = "Rating: \(String(movie.rating))"
         descLabel.text = movie.description
+        posterImageView.image = UIImage(named: movie.imageName)
     }
 }

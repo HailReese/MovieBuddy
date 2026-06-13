@@ -72,8 +72,8 @@ class MovieDetailViewController: UIViewController {
         NSLayoutConstraint.activate([
             posterImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             posterImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            posterImageView.heightAnchor.constraint(equalToConstant: 500),
             posterImageView.widthAnchor.constraint(equalToConstant: 300),
+            posterImageView.heightAnchor.constraint(equalTo: posterImageView.widthAnchor, multiplier: 1.5),
             
             yearLabel.topAnchor.constraint(equalTo: posterImageView.bottomAnchor, constant: 12),
             yearLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -94,5 +94,6 @@ class MovieDetailViewController: UIViewController {
         yearLabel.text = "Year: \(String(movie.year))"
         ratingLabel.text = "Rating: \(String(movie.rating))"
         descLabel.text = movie.description
+        posterImageView.image = UIImage(named: movie.imageName)
     }
 }
