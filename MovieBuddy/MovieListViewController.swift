@@ -25,6 +25,7 @@ class MovieListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "Movies"
         uiExecutor()
         // Do any additional setup after loading the view.
     }
@@ -79,6 +80,10 @@ extension MovieListViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         let selectedMovie = movies[indexPath.row]
+        
+        let detailVC = MovieDetailViewController(movie: selectedMovie)
+        
+        navigationController?.pushViewController(detailVC, animated: true)
         
         print("Пользователь нажал на фильм: \(selectedMovie)")
     }
