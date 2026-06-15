@@ -34,7 +34,21 @@ class MovieListViewController: UIViewController {
         super.viewDidLoad()
         title = "Movies"
         uiExecutor()
-        // Do any additional setup after loading the view.
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped)
+        )
+    }
+    
+    @objc private func addButtonTapped() {
+        let addVC = AddMovieViewController()
+        
+        addVC.delegate = self
+        
+        let navigationController = UINavigationController(rootViewController: addVC)
+        
+        present(navigationController, animated: true, completion: nil)
+        print("Кнопка добавления была нажата")
     }
 }
 
@@ -72,8 +86,8 @@ extension MovieListViewController: UITableViewDataSource {
         
         let movie = movies[indexPath.row]
         
-//        var content = cell.defaultContentConfiguration()
-//        content.text = movieTitle
+        //        var content = cell.defaultContentConfiguration()
+        //        content.text = movieTitle
         cell.configure(for: movie)
         
         return cell
@@ -95,3 +109,12 @@ extension MovieListViewController: UITableViewDelegate {
         print("Пользователь нажал на фильм: \(selectedMovie)")
     }
 }
+
+extension MovieListViewController: AddMovieViewControllerDelegate {
+    func didAddMovie(_ movie: Movie) {
+        movies.append(movie)
+        
+        tableView.reloadData()
+    }
+}
+
