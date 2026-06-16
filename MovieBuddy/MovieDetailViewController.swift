@@ -7,6 +7,7 @@
 
 import UIKit
 
+// MARK: - Main
 class MovieDetailViewController: UIViewController {
     
     private let movie: Movie
@@ -20,8 +21,8 @@ class MovieDetailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: UI Elements
-    let posterImageView: UIImageView = {
+// MARK: - UI Elements
+    private let posterImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .systemGray2
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -31,21 +32,21 @@ class MovieDetailViewController: UIViewController {
         return imageView
     }()
     
-    let yearLabel: UILabel = {
+    private let yearLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemRed
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    let ratingLabel: UILabel = {
+    private let ratingLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemOrange
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    let descLabel: UILabel = {
+    private let descLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemGray
         label.numberOfLines = 0
@@ -58,12 +59,15 @@ class MovieDetailViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = movie.title
-        uiExecutor()
-
-        // Do any additional setup after loading the view.
+        
+        setupLayout()
+        loadMovieData()
     }
-    
-    private func uiExecutor() {
+}
+
+// MARK: - UI Setup & Layout
+private extension MovieDetailViewController {
+    func setupLayout() {
         view.addSubview(posterImageView)
         view.addSubview(yearLabel)
         view.addSubview(ratingLabel)
@@ -86,11 +90,9 @@ class MovieDetailViewController: UIViewController {
             descLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
             descLabel.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor),
         ])
-        
-        loadMovieData(for: movie)
     }
-
-    private func loadMovieData(for movie: Movie) {
+    
+    func loadMovieData() {
         yearLabel.text = "Year: \(String(movie.year))"
         ratingLabel.text = "Rating: \(String(movie.rating))"
         descLabel.text = movie.description

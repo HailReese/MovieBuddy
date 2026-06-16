@@ -7,95 +7,26 @@
 
 import UIKit
 
+// MARK: - Delegate Protocol
 protocol AddMovieViewControllerDelegate: AnyObject {
     func didAddMovie(_ movie: Movie)
 }
 
+// MARK: - Main
 class AddMovieViewController: UIViewController {
     
     weak var delegate: AddMovieViewControllerDelegate?
     
-    //MARK: UI elements
+// MARK: - UI elements
+    private let nameLabel = makeSectionLabel("Movie name")
+    private let yearLabel = makeSectionLabel("Release year")
+    private let ratingLabel = makeSectionLabel("Rating")
+    private let descLabel = makeSectionLabel("Description")
+    private let nameTextField = PaddedTextField(placeholder: "Movie name", keyboardType: .default)
+    private let yearTextField = PaddedTextField(placeholder: "Year", keyboardType: .numberPad)
+    private let ratingTextField = PaddedTextField(placeholder: "Rating", keyboardType: .decimalPad)
     
-    let nameLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Movie name"
-        label.font = .systemFont(ofSize: 14, weight: .medium)
-        label.textColor = .secondaryLabel
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    let yearLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Release year"
-        label.font = .systemFont(ofSize: 14, weight: .medium)
-        label.textColor = .secondaryLabel
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    let ratingLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Rating"
-        label.font = .systemFont(ofSize: 14, weight: .medium)
-        label.textColor = .secondaryLabel
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    let descLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Description"
-        label.font = .systemFont(ofSize: 14, weight: .medium)
-        label.textColor = .secondaryLabel
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    let nameTextField: UITextField = {
-        let field = PaddedTextField()
-        field.placeholder = "Movie name"
-        field.textColor = .label
-        field.textAlignment = .left
-        field.borderStyle = .none
-        field.backgroundColor = .secondarySystemBackground
-        field.layer.cornerRadius = 10
-        field.clipsToBounds = true
-        field.keyboardType = .default
-        field.translatesAutoresizingMaskIntoConstraints = false
-        return field
-    }()
-    
-    let yearTextField: UITextField = {
-        let field = PaddedTextField()
-        field.placeholder = "Year"
-        field.textColor = .label
-        field.textAlignment = .left
-        field.borderStyle = .none
-        field.backgroundColor = .secondarySystemBackground
-        field.layer.cornerRadius = 10
-        field.clipsToBounds = true
-        field.keyboardType = .decimalPad
-        field.translatesAutoresizingMaskIntoConstraints = false
-        return field
-    }()
-    
-    let ratingTextField: UITextField = {
-        let field = PaddedTextField()
-        field.placeholder = "Rating"
-        field.textColor = .label
-        field.textAlignment = .left
-        field.borderStyle = .none
-        field.backgroundColor = .secondarySystemBackground
-        field.layer.cornerRadius = 10
-        field.clipsToBounds = true
-        field.keyboardType = .decimalPad
-        field.translatesAutoresizingMaskIntoConstraints = false
-        return field
-    }()
-    
-    let descTextView: UITextView = {
+    private let descTextView: UITextView = {
         let field = UITextView()
         field.font = .systemFont(ofSize: 16)
         field.backgroundColor = .secondarySystemBackground
@@ -105,11 +36,22 @@ class AddMovieViewController: UIViewController {
         return field
     }()
     
+// MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "New movie"
-        // Do any additional setup after loading the view.
         
+        setupKeyboardHiding()
+        setupLayout()
+        setupNavigationBar()
+    }
+    
+}
+
+// MARK: - UI Setup & Layout
+private extension AddMovieViewController {
+    
+    func setupNavigationBar() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             title: "Cancel",
             style: .plain,
@@ -122,26 +64,9 @@ class AddMovieViewController: UIViewController {
             target: self,
             action: #selector(saveNewMovie)
         )
-        
-        setupKeyboardHiding()
-        uiExecutor()
     }
     
-    @objc private func cancelAddingMovie() {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    @objc private func saveNewMovie() {
-        guard let name = nameTextField.text, let year = yearTextField.text, let rating = ratingTextField.text else { return }
-        delegate?.didAddMovie(
-            Movie(title: name, year: Int(year) ?? 0, rating: Double(rating) ?? 0.0, description: descTextView.text ?? "", imageName: "")
-        )
-        
-        dismiss(animated: true, completion: nil)
-    }
-    
-    private func uiExecutor() {
-        
+    func setupLayout() {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.distribution = .fill
@@ -179,7 +104,20 @@ class AddMovieViewController: UIViewController {
         ])
     }
     
-    private func setupKeyboardHiding() {
+    static func makeSectionLabel(_ name: String) -> UILabel {
+        let label = UILabel()
+        label.text = name
+        label.font = .systemFont(ofSize: 14, weight: .medium)
+        label.textColor = .secondaryLabel
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }
+}
+
+// MARK: - Actions & Keyboard
+private extension AddMovieViewController {
+    
+    func setupKeyboardHiding() {
         let tapGesture = UITapGestureRecognizer(
             target: self,
             action: #selector(dismissKeyboard)
@@ -188,14 +126,48 @@ class AddMovieViewController: UIViewController {
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
     }
+}
+
+// MARK: - @objc methods
+private extension AddMovieViewController {
     
-    @objc private func dismissKeyboard() {
+    @objc func dismissKeyboard() {
         view.endEditing(true)  // Closes the keyboard across the entire view hierarchy
+    }
+    
+    @objc func cancelAddingMovie() {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func saveNewMovie() {
+        guard let name = nameTextField.text, let year = yearTextField.text, let rating = ratingTextField.text else { return }
+        delegate?.didAddMovie(
+            Movie(title: name, year: Int(year) ?? 0, rating: Double(rating) ?? 0.0, description: descTextView.text ?? "", imageName: "")
+        )
+        dismiss(animated: true, completion: nil)
     }
 }
 
+// MARK: - Custom UI Components
 class PaddedTextField: UITextField {
     let padding = UIEdgeInsets(top: 2, left: 15, bottom: 2, right: 15)
+    
+    init(placeholder: String, keyboardType: UIKeyboardType) {
+        super.init(frame: .zero)
+        self.placeholder = placeholder
+        self.textColor = .label
+        self.textAlignment = .left
+        self.borderStyle = .none
+        self.backgroundColor = .secondarySystemBackground
+        self.layer.cornerRadius = 10
+        self.clipsToBounds = true
+        self.keyboardType = keyboardType
+        self.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func textRect(forBounds bounds: CGRect) -> CGRect {
         return bounds.inset(by: padding)

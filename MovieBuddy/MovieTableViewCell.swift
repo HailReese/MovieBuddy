@@ -7,8 +7,11 @@
 
 import UIKit
 
+// MARK: - Main
 class MovieTableViewCell: UITableViewCell {
-    let posterImageView: UIImageView = {
+    
+// MARK: - UI Elements
+    private let posterImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.backgroundColor = .systemGray6
@@ -18,49 +21,25 @@ class MovieTableViewCell: UITableViewCell {
         return imageView
     }()
     
-    let titleLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .systemBlue
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    let yearLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .systemRed
-        label.font = .systemFont(ofSize: 13)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    let ratingLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .systemOrange
-        label.font = .systemFont(ofSize: 13)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    let descLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .systemGray
-        label.font = .systemFont(ofSize: 11)
-        label.numberOfLines = 0
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let titleLabel = makeLabel(color: .systemBlue, font: .systemFont(ofSize: 15), numOfLines: 1)
+    private let yearLabel = makeLabel(color: .label, font: .systemFont(ofSize: 13), numOfLines: 1)
+    private let ratingLabel = makeLabel(color: .label, font: .systemFont(ofSize: 13), numOfLines: 1)
+    private let descLabel = makeLabel(color: .label, font: .systemFont(ofSize: 11), numOfLines: 3)
     
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setupViews()
+        setupLayout()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    private func setupViews() {
+}
+
+// MARK: - UI Setup & Layout
+private extension MovieTableViewCell {
+    func setupLayout() {
         contentView.addSubview(posterImageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(yearLabel)
@@ -90,10 +69,22 @@ class MovieTableViewCell: UITableViewCell {
             descLabel.leadingAnchor.constraint(equalTo: posterImageView.trailingAnchor, constant: 12),
             descLabel.topAnchor.constraint(equalTo: ratingLabel.bottomAnchor, constant: 5),
             descLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            descLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            descLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8),
         ])
     }
     
+    static func makeLabel(color: UIColor, font: UIFont, numOfLines: Int) -> UILabel {
+        let label = UILabel()
+        label.textColor = color
+        label.font = font
+        label.numberOfLines = numOfLines
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }
+}
+
+// MARK: - Configuration
+internal extension MovieTableViewCell {
     func configure(for movie: Movie) {
         titleLabel.text = movie.title
         yearLabel.text = "Year: \(String(movie.year))"

@@ -7,9 +7,11 @@
 
 import UIKit
 
+// MARK: - Main
 class MovieListViewController: UIViewController {
     
-    var movies: [Movie] = [
+// MARK: - Properties
+    private var movies: [Movie] = [
         Movie(title: "Seven", year: 1995, rating: 8.6, description: "Two detectives hunt a serial killer.", imageName: "seven"),
         Movie(title: "Hulk", year: 2003, rating: 5.6, description: "Bruce Banner transforms into a powerful green monster.", imageName: "hulk"),
         Movie(title: "The Dark Knight", year: 2008, rating: 9.0, description: "Batman faces his ultimate enemy, the Joker.", imageName: "the_dark_knight"),
@@ -22,39 +24,26 @@ class MovieListViewController: UIViewController {
         
     ]
     
-    // MARK: UI Elements
+// MARK: - UI Elements
     
-    let tableView: UITableView = {
+    private let tableView: UITableView = {
         var table = UITableView()
         table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
     
+// MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Movies"
-        uiExecutor()
-        
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped)
-        )
-    }
-    
-    @objc private func addButtonTapped() {
-        let addVC = AddMovieViewController()
-        
-        addVC.delegate = self
-        
-        let navigationController = UINavigationController(rootViewController: addVC)
-        
-        present(navigationController, animated: true, completion: nil)
-        print("Кнопка добавления была нажата")
+        setupLayout()
+        setupNavigationBar()
     }
 }
 
-// MARK: UI Setup & Layout
-extension MovieListViewController {
-    func uiExecutor() {
+// MARK: - UI Setup & Layout
+private extension MovieListViewController {
+    func setupLayout() {
         view.addSubview(tableView)
         
         tableView.register(MovieTableViewCell.self, forCellReuseIdentifier: "MovieCell")
@@ -71,6 +60,26 @@ extension MovieListViewController {
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
     }
+    
+    func setupNavigationBar() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped)
+        )
+    }
+}
+
+// MARK: - @objc methods
+extension MovieListViewController {
+    @objc private func addButtonTapped() {
+        let addVC = AddMovieViewController()
+        
+        addVC.delegate = self
+        
+        let navigationController = UINavigationController(rootViewController: addVC)
+        
+        present(navigationController, animated: true, completion: nil)
+//        print("Кнопка добавления была нажата")
+    }
 }
 
 // MARK: - UITableViewDataSource
@@ -86,8 +95,6 @@ extension MovieListViewController: UITableViewDataSource {
         
         let movie = movies[indexPath.row]
         
-        //        var content = cell.defaultContentConfiguration()
-        //        content.text = movieTitle
         cell.configure(for: movie)
         
         return cell
@@ -110,10 +117,10 @@ extension MovieListViewController: UITableViewDelegate {
     }
 }
 
+// MARK: - AddMovieViewControllerDelegate
 extension MovieListViewController: AddMovieViewControllerDelegate {
     func didAddMovie(_ movie: Movie) {
         movies.append(movie)
-        
         tableView.reloadData()
     }
 }
