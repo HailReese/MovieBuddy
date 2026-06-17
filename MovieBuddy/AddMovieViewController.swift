@@ -17,7 +17,7 @@ class AddMovieViewController: UIViewController {
     
     weak var delegate: AddMovieViewControllerDelegate?
     
-// MARK: - UI elements
+    // MARK: - UI elements
     private let nameLabel = makeSectionLabel("Movie name")
     private let yearLabel = makeSectionLabel("Release year")
     private let ratingLabel = makeSectionLabel("Rating")
@@ -36,7 +36,7 @@ class AddMovieViewController: UIViewController {
         return field
     }()
     
-// MARK: - Lifecycle
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "New movie"
@@ -44,8 +44,8 @@ class AddMovieViewController: UIViewController {
         setupKeyboardHiding()
         setupLayout()
         setupNavigationBar()
+        setupFieldActions()
     }
-    
 }
 
 // MARK: - UI Setup & Layout
@@ -64,6 +64,7 @@ private extension AddMovieViewController {
             target: self,
             action: #selector(saveNewMovie)
         )
+        navigationItem.rightBarButtonItem?.isEnabled = false
     }
     
     func setupLayout() {
@@ -98,7 +99,7 @@ private extension AddMovieViewController {
             stackView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -16),
             
             nameTextField.heightAnchor.constraint(equalToConstant: 44),
-            yearTextField.heightAnchor.constraint(equalToConstant: 44),
+            //yearPicker.heightAnchor.constraint(equalToConstant: 44),
             ratingTextField.heightAnchor.constraint(equalToConstant: 44),
             descTextView.heightAnchor.constraint(equalToConstant: 150),
         ])
@@ -126,6 +127,12 @@ private extension AddMovieViewController {
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
     }
+    
+    func setupFieldActions() {
+        nameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        yearTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        ratingTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+    }
 }
 
 // MARK: - @objc methods
@@ -139,10 +146,19 @@ private extension AddMovieViewController {
         dismiss(animated: true, completion: nil)
     }
     
+    @objc func textFieldDidChange() {
+        validateForm()
+    }
+    
     @objc func saveNewMovie() {
-        guard let name = nameTextField.text, let year = yearTextField.text, let rating = ratingTextField.text else { return }
+        guard let name = nameTextField.text,
+              let year = parseYear(for: yearTextField.text),
+              let rating = parseRating(for: ratingTextField.text) else { return }
+        
+        let description = descTextView.text ?? ""
+        
         delegate?.didAddMovie(
-            Movie(title: name, year: Int(year) ?? 0, rating: Double(rating) ?? 0.0, description: descTextView.text ?? "", imageName: "")
+            Movie(title: name, year: year, rating: rating, description: description, imageName: "")
         )
         dismiss(animated: true, completion: nil)
     }
@@ -180,4 +196,41 @@ class PaddedTextField: UITextField {
     override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
         return bounds.inset(by: padding)
     }
+}
+
+// MARK: - Validation & Parsing
+private extension AddMovieViewController {
+    
+    func validateForm() {
+        let isNameValid = !(nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+        
+        let currentYear = Calendar.current.component(.year, from: Date())
+        let year = parseYear(for: yearTextField.text)
+        let isYearValid = year != nil && (1800...currentYear).contains(year!)
+        
+        let rating = parseRating(for: ratingTextField.text)
+        let isRatingValid = rating != nil && (0.0...10.0).contains(rating!)
+        
+        navigationItem.rightBarButtonItem?.isEnabled = isNameValid && isYearValid && isRatingValid
+    }
+    
+    func parseYear(for text: String?) -> Int? {
+        guard let text = text else { return nil }
+        return Int(text)
+    }
+    
+    func parseRating(for text: String?) -> Double? {
+        guard let text = text else { return nil }
+        
+        let formatter = NumberFormatter()
+        
+        formatter.decimalSeparator = "."
+        if let number = formatter.number(from: text) { return number.doubleValue}
+        
+        formatter.decimalSeparator = ","
+        if let number = formatter.number(from: text) { return number.doubleValue}
+        
+        return nil
+    }
+    
 }
