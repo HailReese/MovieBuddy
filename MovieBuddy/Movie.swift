@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Movie {
+struct Movie: Codable {
     let title: String
     let year: Int
     let rating: Double
