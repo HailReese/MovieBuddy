@@ -14,7 +14,7 @@
 		F3DBFED02FD9725700F9D0E1 /* Exceptions for "MovieBuddy" folder in "MovieBuddy" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Application/Info.plist,
 			);
 			target = F3DBFEBD2FD9725600F9D0E1 /* MovieBuddy */;
 		};
@@ -147,7 +147,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 87GX59KD4X;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MovieBuddy/Info.plist;
+				INFOPLIST_FILE = MovieBuddy/Application/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -178,7 +179,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 87GX59KD4X;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MovieBuddy/Info.plist;
+				INFOPLIST_FILE = MovieBuddy/Application/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

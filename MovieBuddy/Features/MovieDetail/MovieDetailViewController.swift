@@ -10,13 +10,12 @@ import UIKit
 // MARK: - Main
 class MovieDetailViewController: UIViewController {
     
-    private let movie: Movie
+    private let viewModel: MovieDetailViewModel
     
-    init(movie: Movie) {
-        self.movie = movie
+    init(viewModel: MovieDetailViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -58,10 +57,9 @@ class MovieDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        title = movie.title
         
         setupLayout()
-        loadMovieData()
+        setupBindings()
     }
 }
 
@@ -92,10 +90,11 @@ private extension MovieDetailViewController {
         ])
     }
     
-    func loadMovieData() {
-        yearLabel.text = "Year: \(String(movie.year))"
-        ratingLabel.text = "Rating: \(String(movie.rating))"
-        descLabel.text = movie.description
-        posterImageView.image = UIImage(named: movie.imageName)
+    private func setupBindings() {
+        title = viewModel.title
+        yearLabel.text = viewModel.year
+        ratingLabel.text = viewModel.rating
+        descLabel.text = viewModel.description
+        posterImageView.image = UIImage(named: viewModel.imageName)
     }
 }

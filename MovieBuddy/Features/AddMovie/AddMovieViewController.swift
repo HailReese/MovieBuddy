@@ -7,15 +7,19 @@
 
 import UIKit
 
-// MARK: - Delegate Protocol
-protocol AddMovieViewControllerDelegate: AnyObject {
-    func didAddMovie(_ movie: Movie)
-}
-
 // MARK: - Main
 class AddMovieViewController: UIViewController {
     
-    weak var delegate: AddMovieViewControllerDelegate?
+    private let viewModel: AddMovieViewModel
+    
+    init(viewModel: AddMovieViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - UI elements
     private let nameLabel = makeSectionLabel("Movie name")
@@ -45,6 +49,7 @@ class AddMovieViewController: UIViewController {
         setupLayout()
         setupNavigationBar()
         setupFieldActions()
+        setupBindings()
     }
 }
 
@@ -113,6 +118,12 @@ private extension AddMovieViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }
+    
+    func setupBindings() {
+        viewModel.isValid.bind({ [weak self] isValid in
+            self?.navigationItem.rightBarButtonItem?.isEnabled = isValid
+        })
+    }
 }
 
 // MARK: - Actions & Keyboard
@@ -131,8 +142,7 @@ private extension AddMovieViewController {
     func setupFieldActions() {
         nameTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         yearTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-        ratingTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-    }
+        ratingTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)    }
 }
 
 // MARK: - @objc methods
@@ -147,19 +157,17 @@ private extension AddMovieViewController {
     }
     
     @objc func textFieldDidChange() {
-        validateForm()
+        viewModel.title = nameTextField.text
+        viewModel.year = yearTextField.text
+        viewModel.rating = ratingTextField.text
+        
+        viewModel.validateForm()
     }
     
     @objc func saveNewMovie() {
-        guard let name = nameTextField.text,
-              let year = parseYear(for: yearTextField.text),
-              let rating = parseRating(for: ratingTextField.text) else { return }
+        viewModel.description = descTextView.text
         
-        let description = descTextView.text ?? ""
-        
-        delegate?.didAddMovie(
-            Movie(title: name, year: year, rating: rating, description: description, imageName: "")
-        )
+        viewModel.saveMovie()
         dismiss(animated: true, completion: nil)
     }
 }
@@ -201,36 +209,6 @@ class PaddedTextField: UITextField {
 // MARK: - Validation & Parsing
 private extension AddMovieViewController {
     
-    func validateForm() {
-        let isNameValid = !(nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
-        
-        let currentYear = Calendar.current.component(.year, from: Date())
-        let year = parseYear(for: yearTextField.text)
-        let isYearValid = year != nil && (1800...currentYear).contains(year!)
-        
-        let rating = parseRating(for: ratingTextField.text)
-        let isRatingValid = rating != nil && (0.0...10.0).contains(rating!)
-        
-        navigationItem.rightBarButtonItem?.isEnabled = isNameValid && isYearValid && isRatingValid
-    }
     
-    func parseYear(for text: String?) -> Int? {
-        guard let text = text else { return nil }
-        return Int(text)
-    }
-    
-    func parseRating(for text: String?) -> Double? {
-        guard let text = text else { return nil }
-        
-        let formatter = NumberFormatter()
-        
-        formatter.decimalSeparator = "."
-        if let number = formatter.number(from: text) { return number.doubleValue}
-        
-        formatter.decimalSeparator = ","
-        if let number = formatter.number(from: text) { return number.doubleValue}
-        
-        return nil
-    }
     
 }
