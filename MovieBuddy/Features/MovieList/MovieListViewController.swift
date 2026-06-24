@@ -69,7 +69,7 @@ private extension MovieListViewController {
 extension MovieListViewController {
     @objc private func addButtonTapped() {
         let addVM = AddMovieViewModel()
-        viewModel.setupDelegate(addMovie: addVM)
+        viewModel.setupAddDelegate(for: addVM)
         let addVC = AddMovieViewController(viewModel: addVM)
         
         let navigationController = UINavigationController(rootViewController: addVC)
@@ -105,8 +105,9 @@ extension MovieListViewController: UITableViewDelegate {
         
         let selectedMovie = viewModel.getMovieByIndex(indexPath.row)
         
-        let movieDetailViewModel = MovieDetailViewModel(selectedMovie)
-        let detailVC = MovieDetailViewController(viewModel: movieDetailViewModel)
+        let detailVM = MovieDetailViewModel(movie: selectedMovie, at: indexPath.row)
+        viewModel.setupDetailDelegate(for: detailVM)
+        let detailVC = MovieDetailViewController(viewModel: detailVM)
         
         navigationController?.pushViewController(detailVC, animated: true)
         

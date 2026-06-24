@@ -12,8 +12,11 @@ class MovieListViewModel {
     // MARK: - Properties
     private(set) var movies = Box<[Movie]>([])
     
-    func setupDelegate(addMovie: AddMovieViewModel) {
+    func setupAddDelegate(for addMovie: AddMovieViewModel) {
         addMovie.delegate = self
+    }
+    func setupDetailDelegate(for movieDetail: MovieDetailViewModel) {
+        movieDetail.delegate = self
     }
     
     private let storageManager = StorageManager.shared
@@ -39,6 +42,14 @@ class MovieListViewModel {
 extension MovieListViewModel: AddMovieViewModelDelegate {
     func didAddMovie(_ movie: Movie) {
         movies.value.append(movie)
+        saveMovies()
+    }
+}
+
+extension MovieListViewModel: MovieDetailViewModelDelegate {
+    func didDeleteMovie(at index: Int) {
+        guard (movies.value.count > index) else { return }
+        movies.value.remove(at: index)
         saveMovies()
     }
 }

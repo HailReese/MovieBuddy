@@ -25,11 +25,10 @@ class AddMovieViewModel {
     let isValid = Box<Bool>(false)
     
     func saveMovie() {
-        print("Заход в сохранение")
         guard let name = self.title,
               let year = parseYear(for: self.year),
               let rating = parseRating(for: self.rating) else { return }
-        print("продолжение сохранения")
+        
         let description = self.description ?? "none"
         
         let movie = Movie(title: name, year: year, rating: rating, description: description, imageName: "")

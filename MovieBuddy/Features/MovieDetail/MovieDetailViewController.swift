@@ -59,12 +59,22 @@ class MovieDetailViewController: UIViewController {
         view.backgroundColor = .systemBackground
         
         setupLayout()
+        setupNavigationBar()
         setupBindings()
     }
 }
 
 // MARK: - UI Setup & Layout
 private extension MovieDetailViewController {
+    
+    func setupNavigationBar() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .trash,
+            target: self,
+            action: #selector(deleteMovie)
+        )
+    }
+    
     func setupLayout() {
         view.addSubview(posterImageView)
         view.addSubview(yearLabel)
@@ -96,5 +106,12 @@ private extension MovieDetailViewController {
         ratingLabel.text = viewModel.rating
         descLabel.text = viewModel.description
         posterImageView.image = UIImage(named: viewModel.imageName)
+    }
+}
+
+extension MovieDetailViewController {
+    @objc private func deleteMovie() {
+        viewModel.deleteMovie()
+        navigationController?.popViewController(animated: true)
     }
 }

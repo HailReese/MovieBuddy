@@ -7,6 +7,10 @@
 
 import Foundation
 
+protocol MovieDetailViewModelDelegate: AnyObject {
+    func didDeleteMovie(at index: Int)
+}
+
 class MovieDetailViewModel {
     
     let title: String
@@ -14,12 +18,20 @@ class MovieDetailViewModel {
     let rating: String
     let description: String
     let imageName: String
+    private let indexInArray: Int
     
-    init(_ movie: Movie) {
+    weak var delegate: MovieDetailViewModelDelegate?
+    
+    init(movie: Movie, at index: Int) {
         self.title = movie.title
         self.year = "Year: \(String(movie.year))"
         self.rating = "Rating: \(String(movie.rating))"
         self.description = movie.description
         self.imageName = movie.imageName
+        self.indexInArray = index
+    }
+    
+    func deleteMovie() {
+        delegate?.didDeleteMovie(at: indexInArray)
     }
 }
