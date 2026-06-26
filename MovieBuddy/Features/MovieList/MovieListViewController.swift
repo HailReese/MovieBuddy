@@ -7,12 +7,11 @@
 
 import UIKit
 
-// MARK: - Main
 class MovieListViewController: UIViewController {
     
     private let viewModel = MovieListViewModel()
     
-// MARK: - UI Elements
+    // MARK: - UI Elements
     
     private let tableView: UITableView = {
         var table = UITableView()
@@ -20,7 +19,7 @@ class MovieListViewController: UIViewController {
         return table
     }()
     
-// MARK: - Lifecycle
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Movies"
@@ -34,7 +33,7 @@ class MovieListViewController: UIViewController {
 // MARK: - UI Setup & Layout
 private extension MovieListViewController {
     
-    private func setupBindings() {
+    func setupBindings() {
         viewModel.movies.bind{ [weak self] _ in
             self?.tableView.reloadData()
         }
@@ -61,6 +60,10 @@ private extension MovieListViewController {
     func setupNavigationBar() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped)
+        )
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            image: UIImage(systemName: "square.grid.2x2"), style: .plain, target: self, action: #selector(addButtonTapped)
         )
     }
 }
