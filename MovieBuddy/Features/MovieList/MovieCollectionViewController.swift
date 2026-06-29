@@ -7,24 +7,31 @@
 
 import UIKit
 
-class MovieGridViewController: UIViewController {
+class MovieViewController: UIViewController {
     
-    private let viewModel = MovieListViewModel()
+    private let viewModel = MovieViewModel()
+    private var isGridLayout = false
     
     // MARK: - UI Elements
     
-    private let collectionViewLayout: UICollectionViewFlowLayout = {
-        let item = UICollectionViewFlowLayout()
-        item.itemSize.width = 100
-        item.itemSize.height = 150
-        item.scrollDirection = .vertical
-        item.minimumLineSpacing = 16
-        item.minimumInteritemSpacing = 16
-        return item
+    private let gridLayout: UICollectionViewFlowLayout = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 8
+        layout.minimumInteritemSpacing = 8
+        return layout
+    }()
+    
+    private let tableLayout: UICollectionViewFlowLayout = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 10
+        layout.minimumInteritemSpacing = 10
+        return layout
     }()
     
     private lazy var collectionView: UICollectionView = {
-        let item = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
+        let item = UICollectionView(frame: .zero, collectionViewLayout: tableLayout)
         item.translatesAutoresizingMaskIntoConstraints = false
         return item
     }()
@@ -33,15 +40,34 @@ class MovieGridViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Movies"
+        view.backgroundColor = .systemBackground
         viewModel.fetchMovieList()
         setupLayout()
         setupNavigationBar()
         setupBindings()
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        updateLayoutSize()
+    }
+
+    private func updateLayoutSize() {
+        tableLayout.itemSize = CGSize(
+            width: view.frame.width,
+            height: 120
+        )
+        
+        gridLayout.itemSize = CGSize(
+            width: (view.frame.width - 32) / 2,
+            height: ((view.frame.width - 32) / 2) * 1.7
+        )
+    }
 }
 
 // MARK: - UI Setup & Layout
-private extension MovieGridViewController {
+private extension MovieViewController {
     
     func setupBindings() {
         viewModel.movies.bind{ [weak self] _ in
@@ -58,8 +84,8 @@ private extension MovieGridViewController {
         
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            collectionView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8),
+            collectionView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
@@ -68,15 +94,14 @@ private extension MovieGridViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped)
         )
-        
         navigationItem.leftBarButtonItem = UIBarButtonItem(
-            image: UIImage(systemName: "list.bullet"), style: .plain, target: self, action: #selector(addButtonTapped)
+            image: isGridLayout ? UIImage(systemName: "list.bullet") : UIImage(systemName: "square.grid.2x2"), style: .plain, target: self, action: #selector(changeLayout)
         )
     }
 }
 
 // MARK: - @objc methods
-extension MovieGridViewController {
+extension MovieViewController {
     @objc private func addButtonTapped() {
         let addVM = AddMovieViewModel()
         viewModel.setupAddDelegate(for: addVM)
@@ -86,10 +111,25 @@ extension MovieGridViewController {
         
         present(navigationController, animated: true, completion: nil)
     }
+    
+    @objc private func changeLayout() {
+        isGridLayout.toggle()
+        
+        navigationItem.leftBarButtonItem?.image = isGridLayout
+        ? UIImage(systemName: "list.bullet")
+        : UIImage(systemName: "square.grid.2x2")
+        
+        collectionView.setCollectionViewLayout(
+            isGridLayout ? gridLayout : tableLayout,
+            animated: false
+        ) { [weak self] _ in
+            self?.collectionView.reloadData()
+        }
+    }
 }
 
 // MARK: - UICollectionViewDataSource
-extension MovieGridViewController: UICollectionViewDataSource {
+extension MovieViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.numberOfItems()
     }
@@ -99,14 +139,14 @@ extension MovieGridViewController: UICollectionViewDataSource {
         
         let movie = viewModel.getMovieByIndex(indexPath.row)
         
-        cell.configure(for: movie)
+        cell.configure(for: movie, isGrid: isGridLayout)
         
         return cell
     }
 }
 
 // MARK: - UICollectionViewDelegate
-extension MovieGridViewController: UICollectionViewDelegate {
+extension MovieViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         

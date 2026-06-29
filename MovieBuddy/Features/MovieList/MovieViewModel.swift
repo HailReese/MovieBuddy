@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MovieListViewModel {
+class MovieViewModel {
     
     // MARK: - Properties
     private(set) var movies = Box<[Movie]>([])
@@ -39,14 +39,14 @@ class MovieListViewModel {
     }
 }
 
-extension MovieListViewModel: AddMovieViewModelDelegate {
+extension MovieViewModel: AddMovieViewModelDelegate {
     func didAddMovie(_ movie: Movie) {
         movies.value.append(movie)
         saveMovies()
     }
 }
 
-extension MovieListViewModel: MovieDetailViewModelDelegate {
+extension MovieViewModel: MovieDetailViewModelDelegate {
     func didDeleteMovie(at index: Int) {
         guard (movies.value.count > index) else { return }
         movies.value.remove(at: index)
