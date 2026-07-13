@@ -24,21 +24,25 @@ final class StorageManager {
     }()
     
     func save(_ items: [Movie]) {
-        do {
-            try encoder.encode(items).write(to: fullPath, options: .atomic)
-        } catch {
-            print("Ошибка сохранения: \(error.localizedDescription)")
+        DispatchQueue.global().async {
+            do {
+                try self.encoder.encode(items).write(to: self.fullPath, options: .atomic)
+            } catch {
+                print("Ошибка сохранения: \(error.localizedDescription)")
+            }
         }
     }
     
-    func load() -> [Movie] {
-        do {
-            let data = try Data(contentsOf: fullPath)
-            let movies = try decoder.decode([Movie].self, from: data)
-            return movies
-        } catch {
-            print("Не удалось загрузить фильмы: \(error.localizedDescription)")
-            return []
+    func load(action: @escaping ([Movie]) -> Void) {
+        DispatchQueue.global().async {
+            do {
+                let data = try Data(contentsOf: self.fullPath)
+                let movies = try self.decoder.decode([Movie].self, from: data)
+                action(movies)
+            } catch {
+                print("Не удалось загрузить фильмы: \(error.localizedDescription)")
+                action([])
+            }
         }
     }
 }

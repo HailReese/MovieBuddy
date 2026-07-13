@@ -22,8 +22,11 @@ class MovieViewModel {
     private let storageManager = StorageManager.shared
     
     func fetchMovieList() {
-        let savedMovies = storageManager.load()
-        movies.value = savedMovies
+        self.storageManager.load { movies in
+            DispatchQueue.main.async {
+                self.movies.value = movies
+            }
+        }
     }
     
     func numberOfItems() -> Int {
