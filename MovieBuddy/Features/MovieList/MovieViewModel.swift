@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 class MovieViewModel {
     
     // MARK: - Properties
@@ -22,10 +23,8 @@ class MovieViewModel {
     private let storageManager = StorageManager.shared
     
     func fetchMovieList() {
-        self.storageManager.load { movies in
-            DispatchQueue.main.async {
-                self.movies.value = movies
-            }
+        Task {
+            self.movies.value = await storageManager.load()
         }
     }
     
@@ -38,7 +37,9 @@ class MovieViewModel {
     }
     
     private func saveMovies() {
-        storageManager.save(movies.value)
+        Task {
+            await storageManager.save(movies.value)
+        }
     }
 }
 

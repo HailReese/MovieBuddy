@@ -23,26 +23,47 @@ final class StorageManager {
         path.appendingPathComponent("movies.json")
     }()
     
-    func save(_ items: [Movie]) {
-        DispatchQueue.global().async {
-            do {
-                try self.encoder.encode(items).write(to: self.fullPath, options: .atomic)
-            } catch {
-                print("Ошибка сохранения: \(error.localizedDescription)")
-            }
+    func save(_ items: [Movie]) async {
+        do {
+            try self.encoder.encode(items).write(to: self.fullPath, options: .atomic)
+        } catch {
+            print("Ошибка чтения базы фильмов: \(error.localizedDescription)")
         }
     }
     
-    func load(action: @escaping ([Movie]) -> Void) {
-        DispatchQueue.global().async {
-            do {
-                let data = try Data(contentsOf: self.fullPath)
-                let movies = try self.decoder.decode([Movie].self, from: data)
-                action(movies)
-            } catch {
-                print("Не удалось загрузить фильмы: \(error.localizedDescription)")
-                action([])
-            }
+    func load() async -> [Movie] {
+        do {
+            let movies = try self.decoder.decode([Movie].self, from: Data(contentsOf: self.fullPath))
+            return movies
+        } catch {
+            print("Ошибка загрузки данных: \(error.localizedDescription)")
         }
+        return []
     }
+    
+//
+    
+// GCD ways to save or load datac
+//    func save(_ items: [Movie]) {
+//        DispatchQueue.global().async {
+//            do {
+//                try self.encoder.encode(items).write(to: self.fullPath, options: .atomic)
+//            } catch {
+//                print("Ошибка сохранения: \(error.localizedDescription)")
+//            }
+//        }
+//    }
+//    
+//    func load(action: @escaping ([Movie]) -> Void) {
+//        DispatchQueue.global().async {
+//            do {
+//                let data = try Data(contentsOf: self.fullPath)
+//                let movies = try self.decoder.decode([Movie].self, from: data)
+//                action(movies)
+//            } catch {
+//                print("Не удалось загрузить фильмы: \(error.localizedDescription)")
+//                action([])
+//            }
+//        }
+//    }
 }
