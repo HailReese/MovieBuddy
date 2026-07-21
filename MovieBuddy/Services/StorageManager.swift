@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class StorageManager {
+actor StorageManager {
     static let shared = StorageManager()
     private init(){}
     
