@@ -11,7 +11,7 @@ import Foundation
 class MovieViewModel {
     
     // MARK: - Properties
-    private(set) var movies = Box<[Movie]>([])
+    private(set) var movies = Box<[MovieSearchItem]>([])
     
     func setupAddDelegate(for addMovie: AddMovieViewModel) {
         addMovie.delegate = self
@@ -20,7 +20,7 @@ class MovieViewModel {
         movieDetail.delegate = self
     }
     
-    private let storageManager = StorageManager.shared
+    private let storageManager = StorageService.shared
     
     func fetchMovieList() {
         Task {
@@ -32,7 +32,7 @@ class MovieViewModel {
         return movies.value.count
     }
     
-    func getMovieByIndex(_ index: Int) -> Movie {
+    func getMovieByIndex(_ index: Int) -> MovieSearchItem {
         return movies.value[index]
     }
     
@@ -44,7 +44,7 @@ class MovieViewModel {
 }
 
 extension MovieViewModel: AddMovieViewModelDelegate {
-    func didAddMovie(_ movie: Movie) {
+    func didAddMovie(_ movie: MovieSearchItem) {
         movies.value.append(movie)
         saveMovies()
     }

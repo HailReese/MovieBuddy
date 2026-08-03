@@ -7,8 +7,8 @@
 
 import Foundation
 
-actor StorageManager {
-    static let shared = StorageManager()
+actor StorageService {
+    static let shared = StorageService()
     private init(){}
     
     private let encoder = JSONEncoder()
@@ -23,7 +23,7 @@ actor StorageManager {
         path.appendingPathComponent("movies.json")
     }()
     
-    func save(_ items: [Movie]) async {
+    func save(_ items: [MovieSearchItem]) async {
         do {
             try self.encoder.encode(items).write(to: self.fullPath, options: .atomic)
         } catch {
@@ -31,9 +31,9 @@ actor StorageManager {
         }
     }
     
-    func load() async -> [Movie] {
+    func load() async -> [MovieSearchItem] {
         do {
-            let movies = try self.decoder.decode([Movie].self, from: Data(contentsOf: self.fullPath))
+            let movies = try self.decoder.decode([MovieSearchItem].self, from: Data(contentsOf: self.fullPath))
             return movies
         } catch {
             print("Ошибка загрузки данных: \(error.localizedDescription)")

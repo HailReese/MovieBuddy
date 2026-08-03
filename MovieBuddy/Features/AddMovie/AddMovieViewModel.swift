@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Delegate Protocol
 protocol AddMovieViewModelDelegate: AnyObject {
-    func didAddMovie(_ movie: Movie)
+    func didAddMovie(_ movie: MovieSearchItem)
 }
 
 class AddMovieViewModel {
@@ -31,7 +31,7 @@ class AddMovieViewModel {
         
         let description = self.description ?? "none"
         
-        let movie = Movie(title: name, year: year, rating: rating, description: description, imageName: "")
+        let movie = MovieSearchItem(title: name, year: year, rating: rating, description: description, imageName: "")
         delegate?.didAddMovie(movie)
     }
     

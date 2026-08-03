@@ -105,7 +105,7 @@ private extension MovieCollectionViewCell {
 
 // MARK: - Configuration
 internal extension MovieCollectionViewCell {
-    func configure(for movie: Movie, isGrid isGridEnabled: Bool) {
+    func configure(for movie: MovieSearchItem, isGrid isGridEnabled: Bool) {
         
         titleLabel.text = movie.title
         yearLabel.text = "Year: \(movie.year)"
