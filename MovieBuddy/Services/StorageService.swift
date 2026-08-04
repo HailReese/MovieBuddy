@@ -12,7 +12,7 @@ actor StorageService {
     private init(){}
     
     private let encoder = JSONEncoder()
-    private let decoder = JSONDecoder()
+    private let decoder = JSONDecoder.movieBuddy
     
     private var path: URL = {
         let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)

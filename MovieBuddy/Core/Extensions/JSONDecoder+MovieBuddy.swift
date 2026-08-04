@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+extension JSONDecoder {
+    static var movieBuddy: JSONDecoder {
+        let decoder = JSONDecoder()
+        return decoder
+    }
+}
