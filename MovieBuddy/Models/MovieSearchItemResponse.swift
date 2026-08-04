@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MovieSearchItem: Codable {
+struct MovieSearchItemResponse: Codable {
     
     let title: String
     let year: String

@@ -13,23 +13,23 @@ actor MovieService {
     
     private let decoder = JSONDecoder.movieBuddy
     
-    func search(query: String) async throws -> MovieSearchList {
+    func search(query: String) async throws -> MovieSearchListResponse {
         
         let endpoint = Endpoint.search(query: query)
-        let movies: MovieSearchList = try await decode(endpoint: endpoint)
+        let movies: MovieSearchListResponse = try await decode(endpoint: endpoint)
         
         return movies
     }
     
-    func getMovie(id query: String) async throws -> MovieDetail {
+    func getMovie(id query: String) async throws -> MovieDetailResponse {
         let endpoint = Endpoint.getById(for: query)
-        let movie: MovieDetail = try await decode(endpoint: endpoint)
+        let movie: MovieDetailResponse = try await decode(endpoint: endpoint)
         return movie
     }
     
-    func getMovie(title query: String) async throws -> MovieDetail {
+    func getMovie(title query: String) async throws -> MovieDetailResponse {
         let endpoint = Endpoint.getByTitle(for: query)
-        let movie: MovieDetail = try await decode(endpoint: endpoint)
+        let movie: MovieDetailResponse = try await decode(endpoint: endpoint)
         
         return movie
     }
@@ -41,7 +41,7 @@ actor MovieService {
             let result = try decoder.decode(T.self, from: data)
             return result
         } catch {
-            if let apiError = try? decoder.decode(APIErrorModel.self, from: data) {
+            if let apiError = try? decoder.decode(APIErrorResponse.self, from: data) {
                 throw NetworkError.apiError(apiError.error)
             }
             throw error

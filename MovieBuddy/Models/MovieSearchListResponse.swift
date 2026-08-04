@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct MovieSearchList: Codable {
-    let search: [MovieSearchItem]
+struct MovieSearchListResponse: Codable {
+    let search: [MovieSearchItemResponse]
     let totalResults: String
     let response: String
     

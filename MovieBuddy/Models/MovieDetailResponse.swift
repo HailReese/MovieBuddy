@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MovieDetail: Codable {
+struct MovieDetailResponse: Codable {
     
     let title: String
     let year: String
@@ -23,7 +23,7 @@ struct MovieDetail: Codable {
     let country: String
     let awards: String
     let poster: URL?
-    let ratings: [RatingItem]
+    let ratings: [RatingItemResponse]
     let metascore: String
     let imdbRating: String
     let imdbVotes: String
