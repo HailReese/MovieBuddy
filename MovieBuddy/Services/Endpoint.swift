@@ -8,24 +8,18 @@
 import Foundation
 
 enum Endpoint {
-    case search(query: String, type: String, year: String, page: String)
+    case search(query: String)
     case getById(for: String)
     case getByTitle(for: String)
     
-    private static let apiKey = "2e2d30fc"
-    
     var url: URL {
         switch self {
-        case .search(let query, let type, let year, let page):
-            return buildURL(query: [
-                URLQueryItem(name: "s", value: query),
-                URLQueryItem(name: "type", value: type),
-                URLQueryItem(name: "y", value: year),
-                URLQueryItem(name: "page", value: page)])
+        case .search(let query):
+            return buildURL(query: [URLQueryItem(name: "apikey", value: "2e2d30fc"), URLQueryItem(name: "s", value: query)])
         case .getById(let query):
-            return buildURL(query: [URLQueryItem(name: "i", value: query)])
+            return buildURL(query: [URLQueryItem(name: "apikey", value: "2e2d30fc"), URLQueryItem(name: "i", value: query)])
         case .getByTitle(let query):
-            return buildURL(query: [URLQueryItem(name: "t", value: query)])
+            return buildURL(query: [URLQueryItem(name: "apikey", value: "2e2d30fc"), URLQueryItem(name: "t", value: query)])
         }
     }
     
@@ -39,7 +33,6 @@ enum Endpoint {
         components.host = "www.omdbapi.com"
         components.path = "/"
         components.queryItems = query
-        components.queryItems?.append(URLQueryItem(name: "apikey", value: Endpoint.apiKey))
         return components.url!
     }
     

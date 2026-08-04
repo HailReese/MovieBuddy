@@ -22,7 +22,7 @@ struct MovieDetail: Codable {
     let language: String
     let country: String
     let awards: String
-    let poster: URL
+    let poster: URL?
     let ratings: [RatingItem]
     let metascore: String
     let imdbRating: String
