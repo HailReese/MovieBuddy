@@ -22,7 +22,6 @@ actor MovieService {
     func getMovie(id query: String) async throws -> MovieDetail {
         let endpoint = Endpoint.getById(for: query)
         let movie: MovieDetail = try await decode(endpoint: endpoint)
-        
         return movie
     }
     
@@ -35,8 +34,15 @@ actor MovieService {
     
     private func decode<T: Decodable>(endpoint: Endpoint) async throws -> T {
         let data = try await NetworkService.shared.perform(for: endpoint.request)
-        let item = try JSONDecoder().decode(T.self, from: data)
         
-        return item
+        do {
+            let result = try JSONDecoder().decode(T.self, from: data)
+            return result
+        } catch {
+            if let apiError = try? JSONDecoder().decode(APIErrorModel.self, from: data) {
+                throw NetworkError.apiError(apiError.error)
+            }
+            throw error
+        }
     }
 }
