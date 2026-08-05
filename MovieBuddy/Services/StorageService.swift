@@ -11,9 +11,6 @@ actor StorageService {
     static let shared = StorageService()
     private init(){}
     
-    private let encoder = JSONEncoder()
-    private let decoder = JSONDecoder.movieBuddy
-    
     private var path: URL = {
         let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         return url[0]
@@ -25,7 +22,7 @@ actor StorageService {
     
     func save(_ items: [MovieSearchItemResponse]) async {
         do {
-            try self.encoder.encode(items).write(to: self.fullPath, options: .atomic)
+            try JSONEncoder.movieBuddy.encode(items).write(to: self.fullPath, options: .atomic)
         } catch {
             print("Ошибка чтения базы фильмов: \(error.localizedDescription)")
         }
@@ -33,7 +30,7 @@ actor StorageService {
     
     func load() async -> [MovieSearchItemResponse] {
         do {
-            let movies = try self.decoder.decode([MovieSearchItemResponse].self, from: Data(contentsOf: self.fullPath))
+            let movies = try JSONDecoder.movieBuddy.decode([MovieSearchItemResponse].self, from: Data(contentsOf: self.fullPath))
             return movies
         } catch {
             print("Ошибка загрузки данных: \(error.localizedDescription)")

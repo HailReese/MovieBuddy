@@ -11,8 +11,6 @@ actor MovieService {
     static let shared = MovieService()
     private init() {}
     
-    private let decoder = JSONDecoder.movieBuddy
-    
     func search(query: String) async throws -> MovieSearchListResponse {
         
         let endpoint = Endpoint.search(query: query)
@@ -38,10 +36,10 @@ actor MovieService {
         let data = try await NetworkService.shared.perform(for: endpoint.request)
         
         do {
-            let result = try decoder.decode(T.self, from: data)
+            let result = try JSONDecoder.movieBuddy.decode(T.self, from: data)
             return result
         } catch {
-            if let apiError = try? decoder.decode(APIErrorResponse.self, from: data) {
+            if let apiError = try? JSONDecoder.movieBuddy.decode(APIErrorResponse.self, from: data) {
                 throw NetworkError.apiError(apiError.error)
             }
             throw error
