@@ -20,7 +20,7 @@ actor StorageService {
         path.appendingPathComponent("movies.json")
     }()
     
-    func save(_ items: [MovieSearchItemResponse]) async {
+    func save(_ items: [Movie]) async {
         do {
             try JSONEncoder.movieBuddy.encode(items).write(to: self.fullPath, options: .atomic)
         } catch {
@@ -28,9 +28,9 @@ actor StorageService {
         }
     }
     
-    func load() async -> [MovieSearchItemResponse] {
+    func load() async -> [Movie] {
         do {
-            let movies = try JSONDecoder.movieBuddy.decode([MovieSearchItemResponse].self, from: Data(contentsOf: self.fullPath))
+            let movies = try JSONDecoder.movieBuddy.decode([Movie].self, from: Data(contentsOf: self.fullPath))
             return movies
         } catch {
             print("Ошибка загрузки данных: \(error.localizedDescription)")

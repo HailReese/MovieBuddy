@@ -22,7 +22,7 @@ class MovieDetailViewModel {
     
     weak var delegate: MovieDetailViewModelDelegate?
     
-    init(movie: MovieSearchItem, at index: Int) {
+    init(movie: Movie, at index: Int) {
         self.title = movie.title
         self.year = "Year: \(String(movie.year))"
         self.rating = "Rating: \(String(movie.rating))"

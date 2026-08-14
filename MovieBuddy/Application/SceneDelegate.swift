@@ -17,7 +17,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         
-        let rootVC = MovieViewController()
+        let rootVC = SearchMovieViewController()
+//        let rootVC = MovieViewController()
         
         let navigationController = UINavigationController(rootViewController: rootVC)
         

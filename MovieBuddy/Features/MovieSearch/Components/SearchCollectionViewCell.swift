@@ -1,13 +1,13 @@
 //
-//  MovieCollectionViewCell.swift
+//  SearchCollectionViewCell.swift
 //  MovieBuddy
 //
-//  Created by Сабит Бектуров on 26.06.2026.
+//  Created by Сабит Бектуров on 13.08.2026.
 //
 
 import UIKit
 
-class MovieCollectionViewCell: UICollectionViewCell {
+class SearchCollectionViewCell: UICollectionViewCell {
     // MARK: - UI Elements
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
@@ -38,7 +38,7 @@ class MovieCollectionViewCell: UICollectionViewCell {
 }
 
 // MARK: - UI Setup & Layout
-private extension MovieCollectionViewCell {
+private extension SearchCollectionViewCell {
     func setupLayout() {
         
         contentView.addSubview(posterImageView)
@@ -104,14 +104,13 @@ private extension MovieCollectionViewCell {
 }
 
 // MARK: - Configuration
-internal extension MovieCollectionViewCell {
-    func configure(for movie: Movie, isGrid isGridEnabled: Bool) {
+internal extension SearchCollectionViewCell {
+    func configure(for movie: MovieSearchItemResponse, isGrid isGridEnabled: Bool) {
         
         titleLabel.text = movie.title
         yearLabel.text = "Year: \(movie.year)"
-        ratingLabel.text = "Rating: \(movie.rating)"
-        descLabel.text = movie.description
-        posterImageView.image = UIImage(named: movie.imageName)
+        ratingLabel.text = "Type: \(movie.type)"
+//        posterImageView.image = UIImage(named: movie.imageName)
         
         NSLayoutConstraint.deactivate(gridConstraints + tableConstraints)
         
