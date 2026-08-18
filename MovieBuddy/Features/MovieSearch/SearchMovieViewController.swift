@@ -234,7 +234,7 @@ extension SearchMovieViewController {
     
     @objc private func loadNextPage() {
         Task {
-            try await viewModel.nextPage()
+            await viewModel.nextPage()
         }
     }
 }
@@ -252,23 +252,14 @@ extension SearchMovieViewController {
 // MARK: - UISearchBarDelegate
 extension SearchMovieViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        print("SEARCH BUTTON")
 
         guard let query = searchBar.text,
               !query.isEmpty else {
-//            print("QUERY EMPTY")
             return
         }
 
-//        print("QUERY:", query)
-
         Task {
-            do {
-                try await viewModel.search(query: query.trimmingCharacters(in: .whitespacesAndNewlines))
-//                print("SEARCH SUCCESS")
-            } catch {
-                
-            }
+            await viewModel.search(query: query.trimmingCharacters(in: .whitespacesAndNewlines))
         }
     }
 }

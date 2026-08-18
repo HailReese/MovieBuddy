@@ -10,6 +10,8 @@ import Foundation
 @MainActor
 class SearchMovieViewModel {
     
+    private let pageSize: Int = 10
+    
     private(set) var movies: [MovieSearchItemResponse] = []
     private(set) var totalPages: Int = 0
     private(set) var currentPage: Int = 1
@@ -17,14 +19,14 @@ class SearchMovieViewModel {
     private(set) var isLoading: Bool = false
     private(set) var isLoadingNextPage: Bool = false
     
-    public var onMoviesUpdated: (() -> Void)?
-    public var onLoadingStarted: (() -> Void)?
-    public var onLoadingFinished: (() -> Void)?
-    public var onLoadingNextPageStarted: (() -> Void)?
-    public var onLoadingNextPageFinished: (() -> Void)?
-    public var nextPageAvailable: (() -> Void)?
-    public var nextPageUnavailable: (() -> Void)?
-    public var onError: ((Error) -> Void)?
+    var onMoviesUpdated: (() -> Void)?
+    var onLoadingStarted: (() -> Void)?
+    var onLoadingFinished: (() -> Void)?
+    var onLoadingNextPageStarted: (() -> Void)?
+    var onLoadingNextPageFinished: (() -> Void)?
+    var nextPageAvailable: (() -> Void)?
+    var nextPageUnavailable: (() -> Void)?
+    var onError: ((Error) -> Void)?
     
     func numberOfItems() -> Int {
         return movies.count
@@ -34,7 +36,7 @@ class SearchMovieViewModel {
         return movies[index]
     }
     
-    func search(query: String) async throws {
+    func search(query: String) async {
         guard !isLoading else { return }
         
         isLoading = true
@@ -46,14 +48,22 @@ class SearchMovieViewModel {
         defer {
             self.onLoadingFinished?()
             isLoading = false
+            
+            
+            if currentPage < totalPages {
+                self.nextPageAvailable?()
+            } else {
+                self.nextPageUnavailable?()
+            }
         }
         
         do {
             let movies = try await MovieService.shared.search(query: query, page: currentPage)
             
-            self.movies = movies.search
             guard let totalResults = Int(movies.totalResults) else { return }
-            self.totalPages = totalResults % 10 == 0 ? totalResults / 10 : totalResults / 10 + 1
+            self.totalPages = totalResults % pageSize == 0 ? totalResults / pageSize : totalResults / pageSize + 1
+            
+            self.movies = movies.search
             
             self.onMoviesUpdated?()
             
@@ -61,16 +71,9 @@ class SearchMovieViewModel {
             onError?(error)
             return
         }
-        
-        
-        if currentPage < totalPages {
-            self.nextPageAvailable?()
-        } else {
-            self.nextPageUnavailable?()
-        }
     }
     
-    func nextPage() async throws {
+    func nextPage() async {
         guard currentPage < totalPages, !isLoadingNextPage else { return }
         
         isLoadingNextPage = true
@@ -81,6 +84,12 @@ class SearchMovieViewModel {
         defer {
             self.onLoadingNextPageFinished?()
             isLoadingNextPage = false
+            
+            if currentPage < totalPages {
+                self.nextPageAvailable?()
+            } else {
+                self.nextPageUnavailable?()
+            }
         }
         
         do {
@@ -94,12 +103,6 @@ class SearchMovieViewModel {
         } catch {
             onError?(error)
             return
-        }
-        
-        if currentPage < totalPages {
-            self.nextPageAvailable?()
-        } else {
-            self.nextPageUnavailable?()
         }
     }
 }
