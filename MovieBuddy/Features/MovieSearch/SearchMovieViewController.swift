@@ -21,6 +21,46 @@ class SearchMovieViewController: UIViewController {
         return search
     }()
     
+    private let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.stopAnimating()
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
+    private let loadingLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Loading..."
+        label.isHidden = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let loadingNewPageIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.stopAnimating()
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
+    private let nextPageButton: UIButton = {
+        var config = UIButton.Configuration.glass()
+        config.title = "Load more"
+        config.baseBackgroundColor = .secondarySystemBackground
+        config.baseForegroundColor = .label
+        config.cornerStyle = .capsule
+
+        let button = UIButton(configuration: config)
+        button.setTitleColor(.systemBlue, for: .normal)
+        button.setTitleColor(.systemGray, for: .disabled)
+        button.isHidden = true
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.isEnabled = false
+        return button
+    }()
+    
     private let gridLayout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -52,13 +92,10 @@ class SearchMovieViewController: UIViewController {
 
         setupNavigationBar()
         setupLayout()
+        callbackHandler()
 
-        searchController.searchResultsUpdater = self
+//        searchController.searchResultsUpdater = self
         searchController.searchBar.delegate = self
-
-        viewModel.onMoviesUpdated = { [weak self] in
-            self?.collectionView.reloadData()
-        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -85,6 +122,11 @@ private extension SearchMovieViewController {
     
     func setupLayout() {
         view.addSubview(collectionView)
+        view.addSubview(nextPageButton)
+        view.addSubview(loadingIndicator)
+        view.addSubview(loadingLabel)
+        view.addSubview(loadingNewPageIndicator)
+        
         
         collectionView.register(SearchCollectionViewCell.self, forCellWithReuseIdentifier: "MovieCell")
         collectionView.dataSource = self
@@ -94,7 +136,17 @@ private extension SearchMovieViewController {
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             collectionView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8),
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            collectionView.bottomAnchor.constraint(equalTo: nextPageButton.topAnchor),
+            nextPageButton.heightAnchor.constraint(equalToConstant: 50),
+            nextPageButton.widthAnchor.constraint(equalToConstant: 150),
+            nextPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            nextPageButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
+            loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            loadingLabel.centerYAnchor.constraint(equalTo: nextPageButton.centerYAnchor),
+            loadingLabel.centerXAnchor.constraint(equalTo: nextPageButton.centerXAnchor, constant: 10),
+            loadingNewPageIndicator.centerYAnchor.constraint(equalTo: nextPageButton.centerYAnchor),
+            loadingNewPageIndicator.trailingAnchor.constraint(equalTo: loadingLabel.leadingAnchor, constant: -5)
         ])
     }
     
@@ -104,6 +156,61 @@ private extension SearchMovieViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             image: isGridLayout ? UIImage(systemName: "list.bullet") : UIImage(systemName: "square.grid.2x2"), style: .plain, target: self, action: #selector(changeLayout)
         )
+        nextPageButton.addTarget(self, action: #selector(loadNextPage), for: .touchUpInside)
+    }
+    
+    func callbackHandler() {
+        viewModel.onMoviesUpdated = { [weak self] in
+            self?.collectionView.reloadData()
+        }
+        
+        viewModel.nextPageAvailable = { [weak self] in
+            self?.nextPageButton.isHidden = false
+            self?.nextPageButton.isEnabled = true
+        }
+        
+        viewModel.nextPageUnavailable = { [weak self] in
+            self?.nextPageButton.isHidden = true
+            self?.nextPageButton.isEnabled = false
+        }
+        
+        viewModel.onLoadingStarted = { [weak self] in
+            self?.loadingIndicator.startAnimating()
+        }
+        
+        viewModel.onLoadingFinished = { [weak self] in
+            self?.loadingIndicator.stopAnimating()
+        }
+        
+        viewModel.onLoadingNextPageStarted = { [weak self] in
+            self?.nextPageButton.isHidden = true
+            self?.loadingLabel.isHidden = false
+            self?.loadingNewPageIndicator.startAnimating()
+        }
+        
+        viewModel.onLoadingNextPageFinished = { [weak self] in
+            self?.nextPageButton.isHidden = false
+            self?.loadingLabel.isHidden = true
+            self?.loadingNewPageIndicator.stopAnimating()
+        }
+        
+        viewModel.onError = { [weak self] error in
+            self?.showError(error)
+        }
+    }
+    
+    private func showError(_ error: Error) {
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+
+        alert.addAction(
+            UIAlertAction(title: "OK", style: .default)
+        )
+
+        present(alert, animated: true)
     }
 }
 
@@ -124,37 +231,43 @@ extension SearchMovieViewController {
             self?.collectionView.reloadData()
         }
     }
-}
-
-// MARK: - UISearchResultsUpdating
-extension SearchMovieViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        guard let searchText = searchController.searchBar.text else { return }
+    
+    @objc private func loadNextPage() {
         Task {
-            try await viewModel.search(query: searchText)
+            try await viewModel.nextPage()
         }
     }
 }
 
+// MARK: - UISearchResultsUpdating
+//extension SearchMovieViewController: UISearchResultsUpdating {
+//    func updateSearchResults(for searchController: UISearchController) {
+//        guard let searchText = searchController.searchBar.text else { return }
+//        Task {
+//            try await viewModel.search(query: searchText)
+//        }
+//    }
+//}
+
 // MARK: - UISearchBarDelegate
 extension SearchMovieViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        print("SEARCH BUTTON")
+//        print("SEARCH BUTTON")
 
         guard let query = searchBar.text,
               !query.isEmpty else {
-            print("QUERY EMPTY")
+//            print("QUERY EMPTY")
             return
         }
 
-        print("QUERY:", query)
+//        print("QUERY:", query)
 
         Task {
             do {
-                try await viewModel.search(query: query)
-                print("SEARCH SUCCESS")
+                try await viewModel.search(query: query.trimmingCharacters(in: .whitespacesAndNewlines))
+//                print("SEARCH SUCCESS")
             } catch {
-                print("SEARCH ERROR:", error)
+                
             }
         }
     }
@@ -170,10 +283,7 @@ extension SearchMovieViewController: UICollectionViewDataSource {
         viewModel.numberOfItems()
     }
 
-    func collectionView(
-        _ collectionView: UICollectionView,
-        cellForItemAt indexPath: IndexPath
-    ) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: "MovieCell",
             for: indexPath

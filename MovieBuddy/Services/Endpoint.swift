@@ -8,14 +8,14 @@
 import Foundation
 
 enum Endpoint {
-    case search(query: String)
+    case search(query: String, page: Int)
     case getById(for: String)
     case getByTitle(for: String)
     
     var url: URL {
         switch self {
-        case .search(let query):
-            return buildURL(query: [URLQueryItem(name: "apikey", value: "2e2d30fc"), URLQueryItem(name: "s", value: query)])
+        case .search(let query, let page):
+            return buildURL(query: [URLQueryItem(name: "apikey", value: "2e2d30fc"), URLQueryItem(name: "s", value: query), URLQueryItem(name: "page", value: String(page))])
         case .getById(let query):
             return buildURL(query: [URLQueryItem(name: "apikey", value: "2e2d30fc"), URLQueryItem(name: "i", value: query)])
         case .getByTitle(let query):

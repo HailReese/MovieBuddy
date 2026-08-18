@@ -11,9 +11,9 @@ actor MovieService {
     static let shared = MovieService()
     private init() {}
     
-    func search(query: String) async throws -> MovieSearchListResponse {
+    func search(query: String, page: Int) async throws -> MovieSearchListResponse {
         
-        let endpoint = Endpoint.search(query: query)
+        let endpoint = Endpoint.search(query: query, page: page)
         let movies: MovieSearchListResponse = try await decode(endpoint: endpoint)
         
         return movies
