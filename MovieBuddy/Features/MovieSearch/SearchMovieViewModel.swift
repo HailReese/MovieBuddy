@@ -60,7 +60,10 @@ class SearchMovieViewModel {
         do {
             let movies = try await MovieService.shared.search(query: query, page: currentPage)
             
-            guard let totalResults = Int(movies.totalResults) else { return }
+            guard let totalResults = Int(movies.totalResults) else {
+                onError?(NetworkError.apiError("Invalid total results"))
+                return
+            }
             self.totalPages = totalResults % pageSize == 0 ? totalResults / pageSize : totalResults / pageSize + 1
             
             self.movies = movies.search

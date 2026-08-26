@@ -16,7 +16,7 @@ class SearchMovieViewController: UIViewController {
     
     private let searchController: UISearchController = {
         let search = UISearchController(searchResultsController: nil)
-        search.searchBar.searchBarStyle = .minimal
+        search.searchBar.searchBarStyle = .default
         search.searchBar.placeholder = "Search for a movie"
         return search
     }()
@@ -130,7 +130,7 @@ private extension SearchMovieViewController {
         
         collectionView.register(SearchCollectionViewCell.self, forCellWithReuseIdentifier: "MovieCell")
         collectionView.dataSource = self
-//        collectionView.delegate = self
+        collectionView.delegate = self
         
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
@@ -152,7 +152,8 @@ private extension SearchMovieViewController {
     
     func setupNavigationBar() {
         navigationItem.searchController = searchController
-        navigationItem.preferredSearchBarPlacement = .stacked
+        navigationItem.searchController?.hidesNavigationBarDuringPresentation = false
+        navigationItem.preferredSearchBarPlacement = .integratedButton
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             image: isGridLayout ? UIImage(systemName: "list.bullet") : UIImage(systemName: "square.grid.2x2"), style: .plain, target: self, action: #selector(changeLayout)
         )
@@ -292,17 +293,18 @@ extension SearchMovieViewController: UICollectionViewDataSource {
     }
 }
 
-//// MARK: - UICollectionViewDelegate
-//extension SearchMovieViewController: UICollectionViewDelegate {
-//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        collectionView.deselectItem(at: indexPath, animated: true)
-//        
-//        let selectedMovie = viewModel.getMovieByIndex(indexPath.row)
-//        
-//        let detailVM = MovieDetailViewModel(movie: selectedMovie, at: indexPath.row)
-//        viewModel.setupDetailDelegate(for: detailVM)
-//        let detailVC = MovieDetailViewController(viewModel: detailVM)
-//        
-//        navigationController?.pushViewController(detailVC, animated: true)
-//    }
-//}
+// MARK: - UICollectionViewDelegate
+extension SearchMovieViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        
+        guard let movie = viewModel.getMovieByIndex(indexPath.row) else {
+            return
+        }
+        
+        let detailVM = SearchMovieDetailViewModel(id: movie.imdbID)
+        let detailVC = SearchMovieDetailViewController(viewModel: detailVM)
+        
+        navigationController?.pushViewController(detailVC, animated: true)
+    }
+}

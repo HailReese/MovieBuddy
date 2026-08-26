@@ -7,7 +7,7 @@
 
 import UIKit
 
-// MARK: - Main
+    // MARK: - Main
 class MovieDetailViewController: UIViewController {
     
     private let viewModel: MovieDetailViewModel
@@ -20,7 +20,7 @@ class MovieDetailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-// MARK: - UI Elements
+    // MARK: - UI Elements
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .systemGray2
@@ -64,7 +64,7 @@ class MovieDetailViewController: UIViewController {
     }
 }
 
-// MARK: - UI Setup & Layout
+    // MARK: - UI Setup & Layout
 private extension MovieDetailViewController {
     
     func setupNavigationBar() {
