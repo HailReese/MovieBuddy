@@ -27,11 +27,31 @@ class SearchMovieDetailViewController: UIViewController {
         return scrollView
     }()
     
-    private let stackView: UIStackView = {
+    private let mainStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 16
-        stackView.alignment = .fill
+        stackView.alignment = .center
+        stackView.distribution = .fill
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
+    private let horizontalStackView1: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 16
+        stackView.alignment = .center
+        stackView.distribution = .fill
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
+    private let horizontalStackView2: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 16
+        stackView.alignment = .center
         stackView.distribution = .fill
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
@@ -45,66 +65,59 @@ class SearchMovieDetailViewController: UIViewController {
         return indicator
     }()
     
-    private let yearLabel: UILabel = {
-        let label = UILabel()
-        label.textAlignment = .left
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let yearLabel = makeSectionLabel(numOfLines: 1, alignment: .center)
     
-    private let ratedLabel: UILabel = {
-        let label = UILabel()
-        label.textAlignment = .right
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let ratedLabel = makeSectionLabel(numOfLines: 1, alignment: .center)
     
-    private let releasedLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let releasedLabel = makeSectionLabel(numOfLines: 1, alignment: .center)
     
-    private let runtimeLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let runtimeLabel = makeSectionLabel(numOfLines: 1, alignment: .center)
     
-    private let genreLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let genreLabel = makeSectionLabel(numOfLines: 0, alignment: .center)
     
-    private let directorLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let directorLabel = makeSectionLabel(numOfLines: 0, alignment: .center)
     
-    private let plotLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.numberOfLines = 0
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    private let writerLabel = makeSectionLabel(numOfLines: 0, alignment: .center)
+    
+    private let actorsLabel = makeSectionLabel(numOfLines: 0, alignment: .center)
+    
+    private let plotLabel = makeSectionLabel(numOfLines: 0, alignment: .center)
+    
+    private let languageLabel = makeSectionLabel(numOfLines: 0, alignment: .center)
+    
+    private let countryLabel = makeSectionLabel(numOfLines: 1, alignment: .center)
+    
+    private let awardsLabel = makeSectionLabel(numOfLines: 0, alignment: .center)
     
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
+        imageView.backgroundColor = .systemGray2
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = 8
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
     
+    private let ratingsLabel = makeSectionLabel(numOfLines: 0, alignment: .center)
+    
+    private let metascoreLabel = makeSectionLabel(numOfLines: 1, alignment: .center)
+    
+    private let imdbRatingLabel = makeSectionLabel(numOfLines: 1, alignment: .center)
+    
+    private let imdbVotesLabel = makeSectionLabel(numOfLines: 1, alignment: .center)
+    
+    private let imdbIDLabel = makeSectionLabel(numOfLines: 1, alignment: .center)
+    
+    private let typeLabel = makeSectionLabel(numOfLines: 1, alignment: .center)
+    
+    private let dvdLabel = makeSectionLabel(numOfLines: 1, alignment: .center)
+    
+    private let boxOfficeLabel = makeSectionLabel(numOfLines: 0, alignment: .natural)
+    
+    private let productionLabel = makeSectionLabel(numOfLines: 0, alignment: .center)
+    
+    private let websiteLabel = makeSectionLabel(numOfLines: 1, alignment: .center)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -116,8 +129,6 @@ class SearchMovieDetailViewController: UIViewController {
         Task {
             await viewModel.loadMovie()
         }
-        
-        testConfig()
     }
     
     private func callbackHandler() {
@@ -138,32 +149,21 @@ class SearchMovieDetailViewController: UIViewController {
             message: error.localizedDescription,
             preferredStyle: .alert
         )
-
+        
         alert.addAction(
             UIAlertAction(title: "OK", style: .default) { [weak self] _ in
                 self?.navigationController?.popViewController(animated: true)
             }
         )
-
+        
         present(alert, animated: true)
     }
 }
 
 // MARK: - UI Setup & Layout
-extension SearchMovieDetailViewController {
+private extension SearchMovieDetailViewController {
     
-    private func testConfig() {
-        title = ""
-        yearLabel.text = "Test Year"
-        ratedLabel.text = "Test Rated"
-        releasedLabel.text = "Test Released"
-        runtimeLabel.text = "Test Runtime"
-        genreLabel.text = "Test Genre"
-        directorLabel.text = "Test Director"
-        plotLabel.text = "Test Plot"
-    }
-    
-    private func setupLayout() {
+    func setupLayout() {
         
         view.addSubview(scrollView)
         view.addSubview(loadingIndicator)
@@ -180,49 +180,68 @@ extension SearchMovieDetailViewController {
             
             loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-            
         ])
-    }
-    
-    private func setupStackView() {
-        scrollView.addSubview(stackView)
+        
+        scrollView.addSubview(mainStackView)
         
         NSLayoutConstraint.activate([
+            mainStackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            mainStackView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            mainStackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             
-            stackView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: 16),
-            
-            stackView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor, constant: 16),
-            
-            stackView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor, constant: -16),
-            
-            stackView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -16),
-            
-            // Важно: ширина контента = ширине ScrollView
-            
-            stackView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor, constant: -32)
-            
+            mainStackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, constant: -32)
         ])
-        
-        stackView.addArrangedSubview(posterImageView)
-        stackView.addArrangedSubview(yearLabel)
-        stackView.addArrangedSubview(ratedLabel)
-        stackView.addArrangedSubview(releasedLabel)
-        stackView.addArrangedSubview(runtimeLabel)
-        stackView.addArrangedSubview(genreLabel)
-        stackView.addArrangedSubview(directorLabel)
-        stackView.addArrangedSubview(plotLabel)
     }
     
-    private func setupBindings() {
+    func setupStackView() {
+        
+        horizontalStackView1.addArrangedSubview(yearLabel)
+        horizontalStackView1.addArrangedSubview(runtimeLabel)
+        horizontalStackView1.addArrangedSubview(ratedLabel)
+        
+        horizontalStackView2.addArrangedSubview(genreLabel)
+        horizontalStackView2.addArrangedSubview(directorLabel)
+        
+        mainStackView.addArrangedSubview(posterImageView)
+        mainStackView.addArrangedSubview(horizontalStackView1)
+        mainStackView.addArrangedSubview(imdbRatingLabel)
+        mainStackView.addArrangedSubview(horizontalStackView2)
+        mainStackView.addArrangedSubview(plotLabel)
+        mainStackView.addArrangedSubview(actorsLabel)
+        mainStackView.addArrangedSubview(writerLabel)
+        mainStackView.addArrangedSubview(languageLabel)
+        mainStackView.addArrangedSubview(countryLabel)
+        
+    }
+    
+    func setupBindings() {
         
         guard let movie = viewModel.movie else { return }
         title = movie.title
-        yearLabel.text = movie.year
-        ratedLabel.text = movie.rated
-        releasedLabel.text = movie.released
-        runtimeLabel.text = movie.runtime
-        genreLabel.text = movie.genre
-        directorLabel.text = movie.director
-        plotLabel.text = movie.plot
+        yearLabel.text = "Year: \(movie.year)"
+        ratedLabel.text = "Rated: \(movie.rated)"
+        releasedLabel.text = "Released: \(movie.released)"
+        runtimeLabel.text = "Runtime: \(movie.runtime)"
+        genreLabel.text = "Genre: \(movie.genre)"
+        directorLabel.text = "Director: \(movie.director)"
+        plotLabel.text = "Plot: \(movie.plot)"
+        imdbRatingLabel.text = "IMDb Rating: \(movie.imdbRating)"
+        actorsLabel.text = "Actors: \(movie.actors)"
+        writerLabel.text = "Writer: \(movie.writer)"
+        languageLabel.text = "Language: \(movie.language)"
+        countryLabel.text = "Country: \(movie.country)"
+    }
+}
+
+// MARK: - Other
+private extension SearchMovieDetailViewController {
+    
+    static func makeSectionLabel(numOfLines: Int, alignment: NSTextAlignment) -> UILabel {
+        let label = UILabel()
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.numberOfLines = numOfLines
+        label.textAlignment = alignment
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }
 }
