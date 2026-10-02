@@ -123,7 +123,7 @@ private extension SearchMovieViewController {
     func setupLayout() {
         view.addSubview(collectionView)
         view.addSubview(nextPageButton)
-        view.addSubview(loadingIndicator)
+//        view.addSubview(loadingIndicator)
         view.addSubview(loadingLabel)
         view.addSubview(loadingNewPageIndicator)
         
@@ -136,17 +136,19 @@ private extension SearchMovieViewController {
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             collectionView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8),
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8),
-            collectionView.bottomAnchor.constraint(equalTo: nextPageButton.topAnchor),
-            nextPageButton.heightAnchor.constraint(equalToConstant: 50),
-            nextPageButton.widthAnchor.constraint(equalToConstant: 150),
-            nextPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            nextPageButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
-            loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            loadingLabel.centerYAnchor.constraint(equalTo: nextPageButton.centerYAnchor),
-            loadingLabel.centerXAnchor.constraint(equalTo: nextPageButton.centerXAnchor, constant: 10),
-            loadingNewPageIndicator.centerYAnchor.constraint(equalTo: nextPageButton.centerYAnchor),
-            loadingNewPageIndicator.trailingAnchor.constraint(equalTo: loadingLabel.leadingAnchor, constant: -5)
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
+//            nextPageButton.heightAnchor.constraint(equalToConstant: 50),
+//            nextPageButton.widthAnchor.constraint(equalToConstant: 150),
+//            nextPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+//            nextPageButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
+//            loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+//            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+//            loadingLabel.centerYAnchor.constraint(equalTo: nextPageButton.centerYAnchor),
+//            loadingLabel.centerXAnchor.constraint(equalTo: nextPageButton.centerXAnchor, constant: 10),
+            loadingNewPageIndicator.heightAnchor.constraint(equalToConstant: 50),
+            loadingNewPageIndicator.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
+            loadingNewPageIndicator.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor),
+            loadingNewPageIndicator.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
         ])
     }
     
@@ -158,6 +160,7 @@ private extension SearchMovieViewController {
             image: isGridLayout ? UIImage(systemName: "list.bullet") : UIImage(systemName: "square.grid.2x2"), style: .plain, target: self, action: #selector(changeLayout)
         )
         nextPageButton.addTarget(self, action: #selector(loadNextPage), for: .touchUpInside)
+        
     }
     
     func callbackHandler() {
@@ -306,5 +309,13 @@ extension SearchMovieViewController: UICollectionViewDelegate {
         let detailVC = SearchMovieDetailViewController(viewModel: detailVM)
         
         navigationController?.pushViewController(detailVC, animated: true)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        
+        let lastItemIndex = viewModel.movies.count - 3
+        if indexPath.item == lastItemIndex {
+            loadNextPage()
+        }
     }
 }
