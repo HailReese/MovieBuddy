@@ -13,7 +13,7 @@ struct MovieSearchItemResponse: Codable {
     let year: String
     let imdbID: String
     let type: String
-    let poster: URL
+    let poster: URL?
     
     enum CodingKeys: String, CodingKey {
         case title = "Title"

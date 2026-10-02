@@ -8,6 +8,19 @@
 import UIKit
 
 class SearchCollectionViewCell: UICollectionViewCell {
+    
+    private var representedID: String?
+    private var imageTask: Task<Void, Never>?
+    
+    override func prepareForReuse() {
+        
+        super.prepareForReuse()
+        imageTask?.cancel()
+        imageTask = nil
+        representedID = nil
+        posterImageView.image = nil
+    }
+    
     // MARK: - UI Elements
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
@@ -55,7 +68,7 @@ private extension SearchCollectionViewCell {
             
             titleLabel.topAnchor.constraint(equalTo: posterImageView.bottomAnchor,constant: 5),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
-//            titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            //            titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             yearLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 3),
             yearLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
@@ -106,12 +119,37 @@ private extension SearchCollectionViewCell {
 // MARK: - Configuration
 internal extension SearchCollectionViewCell {
     func configure(for movie: MovieSearchItemResponse, isGrid isGridEnabled: Bool) {
-        
+        representedID = movie.imdbID
         titleLabel.text = movie.title
         yearLabel.text = "Year: \(movie.year)"
         ratingLabel.text = "Type: \(movie.type)"
-//        posterImageView.image = UIImage(named: movie.imageName)
         
+        representedID = movie.imdbID
+        
+        posterImageView.image = nil
+        
+        imageTask?.cancel()
+
+        imageTask = Task { [weak self] in
+
+            do {
+                if let url = movie.poster {
+                    let image = try await ImageLoader.shared.loadImage(url)
+                    
+                    try Task.checkCancellation()
+                    
+                    await MainActor.run {
+                        
+                        self?.posterImageView.image = image
+                        
+                    }
+                }
+
+            } catch {
+                // smth
+            }
+
+        }
         NSLayoutConstraint.deactivate(gridConstraints + tableConstraints)
         
         if isGridEnabled {

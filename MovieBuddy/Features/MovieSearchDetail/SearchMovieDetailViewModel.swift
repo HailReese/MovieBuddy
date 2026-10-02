@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import UIKit
 
 @MainActor
 class SearchMovieDetailViewModel {
     private(set) var movie: MovieDetailResponse?
+    private(set) var image: UIImage?
     private let id: String
     
     var dataIsLoaded: (() -> Void)?
@@ -20,13 +22,14 @@ class SearchMovieDetailViewModel {
     }
     
     func loadMovie() async {
-        Task {
-            do {
-                movie = try await MovieService.shared.getMovie(id: id)
-                dataIsLoaded?()
-            } catch {
-                onError?(error)
+        do {
+            movie = try await MovieService.shared.getMovie(id: id)
+            if let url = movie?.poster {
+                image = try await ImageLoader.shared.loadImage(url)
             }
+            dataIsLoaded?()
+        } catch {
+            onError?(error)
         }
     }
 }

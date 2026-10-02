@@ -230,6 +230,7 @@ private extension SearchMovieDetailViewController {
         writerLabel.text = "Writer: \(movie.writer)"
         languageLabel.text = "Language: \(movie.language)"
         countryLabel.text = "Country: \(movie.country)"
+        posterImageView.image = viewModel.image
     }
 }
 
